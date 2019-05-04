@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+    {% block htmlbody %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Administrator panel
+                </h3>
+            </div>
+            <div class="panel-body">
+                <input type="file" name="pkl_file" id="pkl_file" multiple class="file-loading" />
+            </div>
+            <div class="panel-body">
+                <a href="/" >Logout...</a>
+            </div>
+        </div>
+    {% end %}
+    {% block JavaScript %}
+        <script src="{{static_url("js/fileinput.min.js")}}"></script>
+        <script>
+            $(function () {
+                var oFileInput = new FileInput();
+                oFileInput.Init("pkl_file", "/data");
+            });
+            var FileInput = function () {
+                var oFile = new Object();
+
+                //init fileinput ctrl
+                oFile.Init = function(ctrlName, uploadUrl) {
+                var control = $('#' + ctrlName);
+
+                    //init upload ctrl style
+                    control.fileinput({
+                        language: 'en', //language
+                        uploadUrl: uploadUrl, //upload address
+                        allowedFileExtensions: ['pkl'],//file extensions
+                        showUpload: true, //show upload button
+                        showCaption: false,//show title?
+                        browseClass: "btn btn-primary", //button type
+                        maxFileCount: 3, //max count
+                        enctype: 'multipart/form-data',
+                        validateInitialCount:true,
+                        previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+                        msgFilesTooMany: "File counts({n}) exceeded max value{m}！",
+                    });
+                    $("#pkl_file").on("fileuploaded", function (event, data, previewId, index) {
+                        return;
+                    });
+                }
+                return oFile;
+            };
+
+        </script>
+        
+    {% end %}

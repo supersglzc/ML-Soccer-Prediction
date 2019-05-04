@@ -1,0 +1,203 @@
+{% extends 'layout.html' %}
+    {% block htmlbody %}
+        <ul id="myTab" class="nav nav-tabs">
+            <li class="active"><a href="#wage" data-toggle="tab">Wage & MarketValue</a></li>
+            <li><a href="#attributes" data-toggle="tab">Attributes</a></li>
+            <li><a href="#login_tab" data-toggle="tab">Login</a></li>
+        </ul>
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade in active" id="wage">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Type</label>
+                                    <div class="col-sm-5">
+                                        <select class="form-control"  id="Type1">
+                                            <option>MarketValue</option>
+                                            <option>Wage</option>
+                                        </select>
+                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="Age1" class="col-sm-2 control-label">Age</label>
+                                <div class="col-sm-5">
+                                    <input type="text" class="form-control" id="Age1" placeholder="Input Age...">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="Height1" class="col-sm-2 control-label">Height(CM)</label>
+                                <div class="col-sm-5">
+                                    <input type="text" class="form-control" id="Height1" placeholder="Input Height(CM)...">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="Weight1" class="col-sm-2 control-label">Weight(KG)</label>
+                                <div class="col-sm-5">
+                                    <input type="text" class="form-control" id="Weight1" placeholder="Input Weight(KG)...">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="TargetValue" class="col-sm-2 control-label">Target Value</label>
+                                <div class="col-sm-5">
+                                    <input type="text" class="form-control" id="TargetValue" placeholder="Input Target Value (Wage Unit: K; Market Value Unit: M)...">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                <button type="button" class="btn btn-default" id="getRequirement">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                        <table class="table" id="requirements">
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="attributes">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Type</label>
+                                    <div class="col-sm-5">
+                                        <select class="form-control" id="Type2">
+                                            <option>MarketValue</option>
+                                            <option>Wage</option>
+                                        </select>
+                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"></label>
+                                <button type="button" class="btn btn-default" id="GetQuestion">Generate question</button>
+                                <button type="button" class="btn btn-default" id="GetValue" disabled="disabled">Get Value</button>
+                                <div class="col-sm-5">
+                                    <input type="text" class="form-control" id="value" placeholder="Value..." readonly="readonly">
+                                </div>
+                            </div>
+                        </form>
+                        <div id="Questions"></div>
+                        <input class="hidden-info hide hidden" type="text" value="" id="QueHide" />
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="login_tab">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                <label for="firstname" class="col-sm-2 control-label">User name</label>
+                                    <div class="col-sm-5">
+                                        <input type="text" class="form-control" id="user" placeholder="User name...">
+                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastname" class="col-sm-2 control-label">Password</label>
+                                    <div class="col-sm-5">
+                                        <input type="text" class="form-control" id="password" placeholder="Password...">
+                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="checkbox">
+                                        <label><input type="checkbox">Remember me.</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="submit" class="btn btn-default" id="login">login</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% end %}
+    {% block JavaScript %}
+        <script type="text/javascript">
+            $("#login").click(function()
+            {
+                var user = $("#user").val();
+                var passwd = $("#password").val();
+                $.post("/login",{name:user,pwd:passwd}, function(data,status){
+                    if(data == "0")
+                    {
+                        window.location.href = '/admin';  
+                    }
+                });
+            });
+        </script>
+        <script>
+            $("#getRequirement").click(function()
+            {
+                var Type= $("#Type1").val();
+                var Age = $("#Age1").val();
+                var Height = $("#Height1").val();
+                var Weight = $("#Weight1").val();
+                var TargetValue = $("#TargetValue").val();
+                $.post("/getReq",{type:Type,age:Age,height:Height,weight:Weight,target:TargetValue}, function(data,status){
+                    if(status == "success")
+                    {
+                        obj=JSON.parse(data);
+                        var html="<caption>Requirements</caption><thead><tr><th>Attribute</th><th>Value</th></tr></thead><tbody>"
+                        for(i in obj)
+                        {
+                            html+="<tr><td>";
+                            html+=i;
+                            html+="</td><td>";
+                            html+=obj[i];
+                            html+="</td></tr></tbody>";
+                        }
+                        $("#requirements").html(html);
+                    }
+                });
+            });
+        </script>
+        <script>
+            $("#GetQuestion").click(function()
+            {
+                $.post("/getQuestion", function(data,status){
+                    if(status == "success")
+                    {
+                        $("#QueHide").val(data);
+                        data=eval(data);
+                        var html="<div class='panel panel-default'><div class='panel-body'>";
+                        for(var i =0;i<data.length-1;i++){
+                            var tmp=data[i].replace("(","_");
+                            tmp=tmp.replace(")","_");
+                            html+="<label for='"+tmp+"' class='col-sm-2 control-label'>"+data[i]+"</label>\
+                                        <div class='col-sm-4'>\
+                                            <input type='text' class='form-control' id='"+tmp+"' placeholder='Input "+data[i]+"...'>\
+                                        </div>";
+                        }
+                        html+="</div></div>";
+                        $("#Questions").html(html);
+                        $("#GetValue").attr('disabled',false);
+                    }
+                });
+            });
+        </script>
+        <script>
+            $("#GetValue").click(function()
+            {   
+                var Type= $("#Type2").val();
+                queList=eval($("#QueHide").val());
+                var answers="";
+                for(var i=0;i< queList.length-1;i++)
+                {   
+                    var tmp="#"+queList[i].replace("(","_");
+                    tmp=tmp.replace(")","_");
+                    answers+=$(tmp).val()+",";
+                }
+                $.post("/getValue",{type:Type,ans:answers}, function(data,status){
+                    if(status == "success")
+                    {
+                        $("#value").val(eval(data));
+                    }
+                });
+            });
+        </script>
+
+    {% end %}
